@@ -63,8 +63,11 @@ else:
     print("they are not equal!")
 '''
 
+
+'''
 # Exercise 2
 A = np.array([[1,2],[3,4]])
+
 
 def determinant(A):
     n, m = A.shape
@@ -85,3 +88,45 @@ B = np.array([[1, 2, 3],
               [0, 4, 5], 
               [1, 0, 6]])
 print(determinant(B))
+'''
+
+'''
+def matmul(a,b):
+
+    a_row,a_col = a.shape
+    b_row,b_col = b.shape
+    
+    if a_row != b_col:
+        print("matrix multiplication cannot occur")
+        return None
+
+    # Initialize result matrix with zeros
+    result = np.zeros((a_row, b_col))
+    
+    # Perform matrix multiplication
+    for i in range(a_row):          # For each row of A
+        for j in range(b_col):      # For each column of B
+            total = 0
+            for k in range(a_col):  # For each element in row i of A and column j of B
+                total += a[i, k] * b[k, j]
+            result[i, j] = total
+    
+    return result
+
+A = np.array([[1,2],[3,4]])
+
+B = np.array([[1, 2, 3],
+              [0, 4, 5], 
+              [1, 0, 6]])
+
+C = np.array([[1,2],[3,4]])
+
+print(matmul(A,C))
+'''
+
+
+        
+
+
+
+
