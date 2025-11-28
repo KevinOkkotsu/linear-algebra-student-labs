@@ -1,5 +1,8 @@
 import numpy as np
 from scipy.sparse import diags
+import matplotlib.pyplot as plt
+import scipy.optimize 
+import time
 
 def print_array(A):
     """
@@ -337,16 +340,29 @@ def gaussian_elimination(A, b, verbose=False):
             print_array(b)
             print()
 
+    # solve using backwards elim
+    x = np.zeros(n)
+
+    for i in range(n - 1, -1, -1):  # iterate over rows backwards
+        partial_sum = 0.0
+        for j in range(i + 1, n):
+            partial_sum += A[i, j] * x[j]
+        x[i] = 1.0 / A[i, i] * (b[i] - partial_sum)
+
+    return x
+
+
+
+
+A_large, b_large, x_large = generate_safe_system(100)
+print(determinant(A_large))
 
 
 
 
 
-
-
-
-'''     
 sizes = [2**j for j in range(1, 6)]
+results = []
 
 for n in sizes:
     # generate a random system of linear equations of size n
@@ -356,31 +372,57 @@ for n in sizes:
 
     # first iteration solves for inteermediate vectors, y1, y2, y3
     # then use y vectors as RHS for second system, U matrix
+    '''
     L,U = lu_factorisation(A)
     y_vectors = forward_substitution(L,b.flatten())
     x_vectors = backward_substitution(U,y_vectors)
-    print(x_vectors)
-'''
+    '''
 
-A = np.array([[2.0, 1.0, 4.0], [1.0, 2.0, 2.0], [2.0, 4.0, 6.0]], dtype=float)
-b = np.array([[12.0], [9.0], [22.0]], dtype=float)
+    # use of time.perf_counter to record startpoint of time and endpoint of time by calling it everytime
+    # time to lu factorise and solve the linear system
+    start_time = time.perf_counter()
+    L, U = lu_factorisation(A)
+    y_vectors = forward_substitution(L, b.flatten())
+    x_lu = backward_substitution(U, y_vectors)
+    time_lu = time.perf_counter() - start_time
 
-print("starting system:")
-print_array(A)
-print_array(b)
-print()
+    # time to solve linear system using gaussian elim + backwards sub
+    start_time = time.perf_counter()
+    x_gauss = gaussian_elimination(A, b)
+    time_gauss = time.perf_counter() - start_time
 
-print("performing Gaussian Elimination")
-gaussian_elimination(A, b, verbose=True)
-print()
+    # error tells you what is the worst case error from the know solution x
+    error_lu = np.max(np.abs(x - x_lu))
+    error_gauss = np.max(np.abs(x - x_gauss))
+    
+    # Store results
+    results.append({
+        "size": n,
+        "time_lu": time_lu,
+        "time_gauss": time_gauss,
+        "error_lu": error_lu,
+        "error_gauss": error_gauss
+    })
 
-print("final system:")
-print_array(A)
-print_array(b)
-print()
+size = [result["size"] for result in results]
+time_taken_gauss = [result["time_gauss"] for result in results]
+time_taken_lu = [result["time_lu"] for result in results]
 
-# test that A is really upper triangular
-print("Is A really upper triangular?", np.allclose(A, np.triu(A)))
+plt.loglog(size, time_taken_gauss, marker='o' , linestyle='-', label= "lecture notes")
+plt.loglog(size, time_taken_lu, marker='o' , linestyle='-', label= "my code")
+
+plt.xlabel("Matrix Size (n x n)")
+plt.ylabel("Time Taken (seconds)")
+plt.title("Time to Compute Vector x in Linear System")
+plt.grid(True)
+plt.legend()
+
+plt.show()
+
+save_path = "lab3plot.png"
+# path to save the file and resolution of graph
+plt.savefig(save_path, dpi=150, bbox_inches="tight")
+
     
     
     

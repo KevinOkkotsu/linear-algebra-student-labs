@@ -90,20 +90,24 @@ def plotGraph(save_path = "simple_plot1.png"):
     times_numpy = [result["time_taken_numpy"] for result in results]
     times_my_code = [result["time_taken_my_code"] for result in results]
 
-    # Plot
+    # This automatically sets up the x,y graph according to the plotted points, sizes against time
+    # plots both lines
     plt.loglog(sizes, times_numpy, marker="o", linestyle="-", label="numpy")
     plt.loglog(sizes, times_my_code, marker="o", linestyle="-", label="my code")
 
-    # Labels and title
+    # Labels and title of the x,y graph
     plt.xlabel("Matrix Size (n x n)")
     plt.ylabel("Time Taken (seconds)")
     plt.title("Time to Compute Determinant vs Matrix Size")
+    # adds the plot lines to make graph easier to read
     plt.grid(True)
+    # this identifies which line is numpy and my code
     plt.legend()
 
     # Show plot
     plt.show()
 
+    # path to save the file and resolution of graph
     plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
 plotGraph()
